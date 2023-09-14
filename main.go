@@ -1,22 +1,35 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/h3poteto/prometheus-humidity-exporter/dht20"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func recordMetrics() {
-	go func() {
+func recordMetrics() error {
+	sensor, err := dht20.New()
+	if err != nil {
+		return err
+	}
+	go func(sensor *dht20.DHT20) {
+		defer sensor.Clean()
 		for {
-			humidity.Set(62.6)
-			temperature.Set(35.0)
-			time.Sleep(2 * time.Second)
+			hum, tmp, err := sensor.Get()
+			if err != nil {
+				log.Printf("[error] %v", err)
+			}
+			humidity.Set(hum)
+			temperature.Set(tmp)
+			time.Sleep(30 * time.Second)
 		}
-	}()
+	}(sensor)
+
+	return nil
 }
 
 var (

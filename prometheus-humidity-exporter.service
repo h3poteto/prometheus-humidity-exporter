@@ -1,0 +1,18 @@
+[Unit]
+Description=Humidity and Tempreature exporter for Prometheus
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/prometheus-humidity-exporter
+ExecStart=/usr/bin/prometheus-humidity-exporter
+Restart=always
+RestartSec=10
+Environment=LANG=en_US.UTF-8
+SyslogIdentifier=prometheus-humidity-exporter
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target
