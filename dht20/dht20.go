@@ -1,7 +1,7 @@
 package dht20
 
 import (
-	"errors"
+	"fmt"
 	"log"
 	"math"
 	"time"
@@ -32,8 +32,10 @@ func (d *DHT20) Get() (float64, float64, error) {
 	if err != nil {
 		return 0, -273, err
 	}
-	if ret != 0x1c {
-		return 0, -273, errors.New("Initial code is not 28 (0x1c)")
+	// At first, initial code was 28 (0x1c)
+	// After that, initial code is 24 (0x18). Sometimes it changes.
+	if ret != 0x18 && ret != 0x1c {
+		return 0, -273, fmt.Errorf("Initial code is not good, actual %v", ret)
 	}
 
 	time.Sleep(10 * time.Millisecond)
